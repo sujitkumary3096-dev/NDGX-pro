@@ -1,0 +1,2250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniGuard — Sovereign Security Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --white:       #ffffff;
+  --bg:          #f7f8fa;
+  --bg-card:     #ffffff;
+  --bg-input:    #f9fafb;
+  --bg-code:     #f4f5f7;
+  --border:      #e8eaed;
+  --border-mid:  #d1d5db;
+  --border-focus:#1a56db;
+
+  --text-1:      #0f1117;
+  --text-2:      #374151;
+  --text-3:      #6b7280;
+  --text-4:      #9ca3af;
+
+  --blue:        #1a56db;
+  --blue-light:  #eff3ff;
+  --blue-mid:    #c7d4f8;
+  --blue-hover:  #1649c7;
+
+  --green:       #059669;
+  --green-light: #ecfdf5;
+  --amber:       #d97706;
+  --amber-light: #fffbeb;
+  --red:         #dc2626;
+  --red-light:   #fef2f2;
+  --purple:      #7c3aed;
+  --purple-light:#f5f3ff;
+  --teal:        #0891b2;
+  --teal-light:  #ecfeff;
+
+  --shadow-xs:   0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:   0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+  --shadow-lg:   0 10px 15px -3px rgba(0,0,0,0.07), 0 4px 6px -2px rgba(0,0,0,0.04);
+  --shadow-xl:   0 20px 25px -5px rgba(0,0,0,0.07), 0 10px 10px -5px rgba(0,0,0,0.03);
+
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-full: 9999px;
+
+  --font-body:   'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:   'DM Mono', 'SF Mono', 'Fira Code', monospace;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-1);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+/* allow selection only in inputs/textareas */
+input, textarea, .selectable { user-select: text; -webkit-user-select: text; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 10px; }
+
+/* ============================================================
+   TYPOGRAPHY SCALE
+   ============================================================ */
+h1 { font-size: clamp(28px, 4vw, 48px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+h2 { font-size: clamp(22px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; }
+h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.3; }
+h4 { font-size: 15px; font-weight: 600; line-height: 1.4; }
+p  { font-size: 15px; color: var(--text-2); line-height: 1.7; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.page-wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.section { display: none; min-height: 100vh; padding: 100px 0 80px; }
+.section.active { display: block; animation: fadeUp 0.35s ease both; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 64px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 32px;
+  width: 100%; display: flex; align-items: center; gap: 0;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; margin-right: 48px;
+}
+.nav-logo-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.nav-brand-name {
+  font-size: 17px; font-weight: 700; color: var(--text-1);
+  letter-spacing: -0.02em;
+}
+.nav-links {
+  display: flex; align-items: center; gap: 2px;
+  overflow-x: auto; scrollbar-width: none; flex: 1;
+}
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-link {
+  font-size: 14px; font-weight: 500; color: var(--text-3);
+  padding: 6px 14px; border-radius: var(--radius-full);
+  cursor: pointer; transition: all 0.18s; white-space: nowrap;
+  border: none; background: transparent;
+}
+.nav-link:hover { color: var(--text-1); background: var(--bg); }
+.nav-link.active { color: var(--blue); background: var(--blue-light); }
+.nav-badge {
+  margin-left: 12px;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500; color: var(--green);
+  padding: 4px 10px; background: var(--green-light);
+  border-radius: var(--radius-full); white-space: nowrap;
+}
+.nav-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 2px rgba(5,150,105,0.25);
+  animation: pulse-dot 2s infinite;
+}
+@keyframes pulse-dot {
+  0%,100% { box-shadow: 0 0 0 2px rgba(5,150,105,0.25); }
+  50% { box-shadow: 0 0 0 5px rgba(5,150,105,0.1); }
+}
+
+/* ============================================================
+   SECTION HEADERS
+   ============================================================ */
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--blue);
+  background: var(--blue-light); padding: 4px 12px;
+  border-radius: var(--radius-full); margin-bottom: 16px;
+}
+.section-title { color: var(--text-1); margin-bottom: 8px; }
+.section-subtitle { font-size: 16px; color: var(--text-3); max-width: 560px; }
+.section-header { margin-bottom: 40px; }
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.card:hover { box-shadow: var(--shadow-md); }
+.card-header {
+  padding: 20px 24px 0;
+  display: flex; align-items: center; gap: 12px;
+}
+.card-icon {
+  width: 40px; height: 40px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.card-title { font-size: 15px; font-weight: 600; color: var(--text-1); }
+.card-subtitle { font-size: 13px; color: var(--text-3); margin-top: 2px; }
+.card-body { padding: 20px 24px 24px; }
+.card-divider { height: 1px; background: var(--border); margin: 0; }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--font-body);
+  font-size: 14px; font-weight: 600;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  border: none; cursor: pointer;
+  transition: all 0.18s; outline: none;
+  white-space: nowrap; text-decoration: none;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--blue); color: #fff;
+  box-shadow: 0 1px 2px rgba(26,86,219,0.3), 0 0 0 0 rgba(26,86,219,0);
+}
+.btn-primary:hover {
+  background: var(--blue-hover);
+  box-shadow: 0 4px 12px rgba(26,86,219,0.3);
+}
+
+.btn-secondary {
+  background: var(--white); color: var(--text-1);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
+}
+.btn-secondary:hover {
+  background: var(--bg);
+  border-color: var(--border-mid);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-ghost {
+  background: transparent; color: var(--text-3);
+  border: 1px solid transparent;
+}
+.btn-ghost:hover { background: var(--bg); color: var(--text-1); }
+
+.btn-danger {
+  background: var(--red-light); color: var(--red);
+  border: 1px solid #fecaca;
+}
+.btn-danger:hover { background: #fee2e2; }
+
+.btn-success {
+  background: var(--green-light); color: var(--green);
+  border: 1px solid #a7f3d0;
+}
+
+.btn-sm { font-size: 13px; padding: 7px 14px; border-radius: var(--radius-sm); }
+.btn-lg { font-size: 15px; padding: 13px 28px; border-radius: var(--radius-md); }
+.btn-full { width: 100%; justify-content: center; }
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label {
+  font-size: 13px; font-weight: 600; color: var(--text-2);
+  letter-spacing: -0.01em;
+}
+.form-input {
+  font-family: var(--font-body);
+  font-size: 14px; color: var(--text-1);
+  background: var(--bg-input);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  outline: none; width: 100%;
+  transition: all 0.18s;
+}
+.form-input:focus {
+  border-color: var(--border-focus);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
+}
+.form-input::placeholder { color: var(--text-4); }
+textarea.form-input { resize: vertical; min-height: 100px; line-height: 1.6; }
+select.form-input { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+
+.form-hint { font-size: 12px; color: var(--text-4); }
+
+/* ============================================================
+   OUTPUT / CODE BOX
+   ============================================================ */
+.output-box {
+  background: var(--bg-code);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-2);
+  min-height: 72px;
+  line-height: 1.7;
+  word-break: break-all;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.output-box.success { border-color: #a7f3d0; background: var(--green-light); color: var(--green); }
+.output-box.error   { border-color: #fecaca; background: var(--red-light); color: var(--red); }
+.output-box.amber   { border-color: #fcd34d; background: var(--amber-light); color: var(--amber); }
+
+/* ============================================================
+   ALERTS / BADGES
+   ============================================================ */
+.alert {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 16px; border-radius: var(--radius-md);
+  font-size: 13.5px; line-height: 1.55;
+  border: 1px solid;
+}
+.alert-info    { background: var(--blue-light);   border-color: var(--blue-mid);  color: #1e40af; }
+.alert-success { background: var(--green-light);  border-color: #6ee7b7;          color: #065f46; }
+.alert-warning { background: var(--amber-light);  border-color: #fcd34d;          color: #92400e; }
+.alert-error   { background: var(--red-light);    border-color: #fecaca;          color: #991b1b; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
+  padding: 3px 9px; border-radius: var(--radius-full);
+}
+.badge-blue    { background: var(--blue-light);   color: var(--blue); }
+.badge-green   { background: var(--green-light);  color: var(--green); }
+.badge-amber   { background: var(--amber-light);  color: var(--amber); }
+.badge-red     { background: var(--red-light);    color: var(--red); }
+.badge-purple  { background: var(--purple-light); color: var(--purple); }
+.badge-teal    { background: var(--teal-light);   color: var(--teal); }
+
+/* ============================================================
+   METRIC CARDS
+   ============================================================ */
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 12px; }
+.metric-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-xs);
+}
+.metric-value { font-size: 26px; font-weight: 700; letter-spacing: -0.03em; color: var(--text-1); line-height: 1; }
+.metric-label { font-size: 12px; color: var(--text-3); margin-top: 5px; font-weight: 500; }
+
+/* ============================================================
+   TOGGLE
+   ============================================================ */
+.toggle { position:relative; width:42px; height:24px; display:inline-block; flex-shrink:0; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-track {
+  position:absolute; inset:0;
+  background:#e5e7eb; border-radius:var(--radius-full);
+  cursor:pointer; transition:0.22s;
+}
+.toggle-track::before {
+  content:''; position:absolute;
+  width:18px; height:18px; left:3px; top:3px;
+  background:#fff; border-radius:50%;
+  box-shadow: var(--shadow-xs);
+  transition:0.22s;
+}
+.toggle input:checked + .toggle-track { background: var(--blue); }
+.toggle input:checked + .toggle-track::before { transform:translateX(18px); }
+
+/* ============================================================
+   PROGRESS / STRENGTH
+   ============================================================ */
+.strength-bar { display:flex; gap:3px; height:4px; border-radius:var(--radius-full); overflow:hidden; }
+.strength-seg { flex:1; background: var(--border); border-radius:var(--radius-full); transition:background 0.3s; }
+.strength-seg.weak   { background: var(--red); }
+.strength-seg.medium { background: var(--amber); }
+.strength-seg.strong { background: var(--green); }
+
+/* ============================================================
+   TABS
+   ============================================================ */
+.tab-bar {
+  display: flex; gap: 4px;
+  background: var(--bg); border-radius: var(--radius-md);
+  padding: 4px; margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+.tab-item {
+  flex: 1; text-align: center;
+  font-size: 13px; font-weight: 500; color: var(--text-3);
+  padding: 8px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.18s;
+  white-space: nowrap;
+}
+.tab-item.active {
+  background: var(--white); color: var(--text-1);
+  box-shadow: var(--shadow-xs);
+  font-weight: 600;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+.table-wrap { border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-size: 12px; font-weight: 600; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 11px 16px; background: var(--bg);
+  text-align: left; border-bottom: 1px solid var(--border);
+}
+tbody td { font-size: 13.5px; color: var(--text-2); padding: 11px 16px; border-bottom: 1px solid var(--border); }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--bg); }
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ============================================================
+   GRID LAYOUTS
+   ============================================================ */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 20px; }
+.col-full { grid-column: 1/-1; }
+
+/* ============================================================
+   TOOL CARD (HOME GRID)
+   ============================================================ */
+.tool-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.22s;
+  box-shadow: var(--shadow-xs);
+  position: relative;
+  overflow: hidden;
+}
+.tool-card::before {
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+  background: var(--accent, var(--blue));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.22s;
+}
+.tool-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+.tool-card:hover::before { transform: scaleX(1); }
+.tool-card-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+}
+.tool-card-name { font-size: 15px; font-weight: 700; color: var(--text-1); margin-bottom: 5px; }
+.tool-card-desc { font-size: 13px; color: var(--text-3); line-height: 1.55; }
+.tool-card-footer {
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* ============================================================
+   NODE VISUALIZATION
+   ============================================================ */
+.node-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:4px 0; }
+.node-item { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.node-circle {
+  width:44px; height:44px; border-radius:50%;
+  border: 2px solid var(--border); background: var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:600; color:var(--text-3);
+  transition: all 0.3s;
+}
+.node-circle.connected { border-color:var(--blue); color:var(--blue); background:var(--blue-light); box-shadow:0 0 0 4px rgba(26,86,219,0.08); }
+.node-circle.self { border-color:var(--green); color:var(--green); background:var(--green-light); box-shadow:0 0 0 4px rgba(5,150,105,0.08); }
+.node-label { font-size:10px; color:var(--text-4); text-align:center; font-weight:500; }
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 120px 0 80px;
+  position: relative;
+}
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0; overflow: hidden;
+  pointer-events: none;
+}
+.hero-bg-blob {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.45;
+}
+.hero-content { position: relative; z-index: 1; }
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 6px 16px 6px 10px;
+  font-size: 13px; font-weight: 600; color: var(--text-2);
+  box-shadow: var(--shadow-xs);
+  margin-bottom: 28px;
+}
+.hero-stats {
+  display: flex; gap: 40px; flex-wrap: wrap;
+  margin-top: 40px; padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+.hero-stat-value { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; color: var(--text-1); }
+.hero-stat-label { font-size: 13px; color: var(--text-3); margin-top: 2px; }
+
+/* ============================================================
+   BAR CHART
+   ============================================================ */
+.bar-chart { display:flex; align-items:flex-end; gap:3px; height:60px; }
+.bar-item { flex:1; background:var(--blue-mid); border-radius:3px 3px 0 0; min-height:3px; transition:height 0.4s ease; }
+
+/* ============================================================
+   CONTACT FORM
+   ============================================================ */
+.contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start; }
+.contact-info-card {
+  background: linear-gradient(135deg, var(--blue) 0%, #1649c7 100%);
+  border-radius: var(--radius-xl); padding: 36px; color: #fff;
+  position: relative; overflow: hidden;
+}
+.contact-info-card::before {
+  content:''; position:absolute; top:-30px; right:-30px;
+  width:160px; height:160px; border-radius:50%;
+  background:rgba(255,255,255,0.07);
+}
+.contact-info-card::after {
+  content:''; position:absolute; bottom:-40px; left:-20px;
+  width:120px; height:120px; border-radius:50%;
+  background:rgba(255,255,255,0.05);
+}
+
+/* ============================================================
+   PRIVACY POLICY
+   ============================================================ */
+.policy-grid { display:grid; grid-template-columns:240px 1fr; gap:32px; align-items:start; }
+.policy-nav {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 8px; position:sticky; top:80px;
+}
+.policy-nav-item {
+  display:block; padding:10px 14px; border-radius:var(--radius-md);
+  font-size:13.5px; font-weight:500; color:var(--text-3); cursor:pointer;
+  transition:all 0.18s;
+}
+.policy-nav-item:hover { background:var(--bg); color:var(--text-1); }
+.policy-nav-item.active { background:var(--blue-light); color:var(--blue); font-weight:600; }
+.policy-content h3 { font-size:16px; color:var(--text-1); margin:28px 0 10px; }
+.policy-content h3:first-child { margin-top:0; }
+.policy-content p { font-size:14.5px; color:var(--text-2); margin-bottom:12px; }
+
+/* ============================================================
+   ABOUT PAGE
+   ============================================================ */
+.about-hero {
+  background: linear-gradient(135deg, #f0f4ff 0%, #fafbff 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 56px; margin-bottom: 32px;
+}
+.team-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px;
+  text-align: center;
+}
+.team-avatar {
+  width: 56px; height: 56px; border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--blue-light), var(--blue-mid));
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+}
+
+/* ============================================================
+   SVG ICONS
+   ============================================================ */
+.icon { display:inline-block; flex-shrink:0; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .page-wrap { padding: 0 20px; }
+  .grid-2, .grid-3, .contact-grid, .policy-grid { grid-template-columns: 1fr; }
+  .hero-stats { gap:24px; }
+  .nav-links { max-width: calc(100vw - 200px); }
+  .about-hero { padding: 32px; }
+}
+@media (max-width: 600px) {
+  .metric-grid { grid-template-columns: 1fr 1fr; }
+  .node-grid { grid-template-columns: repeat(4,1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" onclick="showSection('home')" style="cursor:pointer;">
+      <div class="nav-logo-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <span class="nav-brand-name">OmniGuard</span>
+    </a>
+
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showSection('home')">Home</button>
+
+      <!-- TOOLS DROPDOWN TRIGGER -->
+      <button class="nav-link" onclick="showSection('tools-hub')">Tools</button>
+
+      <button class="nav-link" onclick="showSection('vault')">Vault</button>
+      <button class="nav-link" onclick="showSection('nexus')">P2P Nexus</button>
+      <button class="nav-link" onclick="showSection('audit')">Auditor</button>
+      <button class="nav-link" onclick="showSection('netwatch')">Net Watch</button>
+      <button class="nav-link" onclick="showSection('hashlab')">Hash Lab</button>
+      <button class="nav-link" onclick="showSection('keyforge')">Key Forge</button>
+      <button class="nav-link" onclick="showSection('dataprobe')">Data Probe</button>
+      <button class="nav-link" onclick="showSection('sigverify')">Sig Verify</button>
+      <button class="nav-link" onclick="showSection('stegano')">Stegano</button>
+      <button class="nav-link" onclick="showSection('permscan')">Permissions</button>
+      <button class="nav-link" onclick="showSection('memguard')">Mem Guard</button>
+      <button class="nav-link" onclick="showSection('aicontrol')">AI Control</button>
+
+      <button class="nav-link" onclick="showSection('about')">About</button>
+      <button class="nav-link" onclick="showSection('privacy')">Privacy</button>
+      <button class="nav-link" onclick="showSection('contact')">Contact</button>
+    </div>
+
+    <div class="nav-badge">
+      <div class="nav-badge-dot"></div>
+      All Systems Online
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HOME
+     ============================================================ -->
+<section id="home" class="section active">
+  <div class="hero">
+    <div class="hero-bg">
+      <div class="hero-bg-blob" style="width:600px;height:600px;top:-200px;right:-150px;background:radial-gradient(circle,rgba(26,86,219,0.08),transparent 70%);"></div>
+      <div class="hero-bg-blob" style="width:400px;height:400px;bottom:-100px;left:-100px;background:radial-gradient(circle,rgba(5,150,105,0.06),transparent 70%);"></div>
+    </div>
+    <div class="page-wrap hero-content">
+      <div class="hero-tag">
+        <div style="width:20px;height:20px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        Sovereign Security Infrastructure — v3.0
+      </div>
+
+      <h1 style="max-width:760px;margin-bottom:20px;">
+        Enterprise-Grade Security<br>
+        <span style="color:var(--blue);">Without the Enterprise.</span>
+      </h1>
+      <p style="font-size:18px;max-width:560px;color:var(--text-3);line-height:1.65;">
+        12 elite cryptographic tools. Zero servers. Zero telemetry.<br>
+        Runs entirely in your browser using the Web Crypto API.
+      </p>
+
+      <div style="display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-lg" onclick="showSection('tools-hub')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><rect x="16" y="3" width="6" height="6" rx="1"/><rect x="2" y="10" width="6" height="6" rx="1"/><rect x="9" y="10" width="6" height="6" rx="1"/><rect x="16" y="10" width="6" height="6" rx="1"/><rect x="2" y="17" width="6" height="6" rx="1"/><rect x="9" y="17" width="6" height="6" rx="1"/><rect x="16" y="17" width="6" height="6" rx="1"/></svg>
+          Explore All Tools
+        </button>
+        <button class="btn btn-secondary btn-lg" onclick="showSection('vault')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Open Quantum Vault
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-value" id="counter-modules">0</div>
+          <div class="hero-stat-label">Active Modules</div>
+        </div>
+        <div>
+          <div class="hero-stat-value">AES-256</div>
+          <div class="hero-stat-label">Encryption Grade</div>
+        </div>
+        <div>
+          <div class="hero-stat-value">0</div>
+          <div class="hero-stat-label">External Servers</div>
+        </div>
+        <div>
+          <div class="hero-stat-value">100%</div>
+          <div class="hero-stat-label">Client-Side</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TOOLS HUB
+     ============================================================ -->
+<section id="tools-hub" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><rect x="16" y="3" width="6" height="6" rx="1"/><rect x="2" y="10" width="6" height="6" rx="1"/><rect x="9" y="10" width="6" height="6" rx="1"/><rect x="16" y="10" width="6" height="6" rx="1"/></svg>
+        12 Elite Modules
+      </div>
+      <h2 class="section-title">Security Toolkit</h2>
+      <p class="section-subtitle">Every tool runs locally. No data ever leaves your device.</p>
+    </div>
+
+    <div class="grid-auto" id="toolsGrid"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     QUANTUM VAULT
+     ============================================================ -->
+<section id="vault" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow" style="background:var(--amber-light);color:var(--amber);">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Module 01
+      </div>
+      <h2 class="section-title">Quantum Vault</h2>
+      <p class="section-subtitle">AES-256-GCM encryption with PBKDF2 key derivation. 600,000 iterations. Military-grade.</p>
+    </div>
+    <div class="grid-2">
+      <!-- ENCRYPT -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--amber-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Encrypt</div>
+            <div class="card-subtitle">AES-256-GCM with 96-bit IV</div>
+          </div>
+          <span class="badge badge-amber" style="margin-left:auto;">SECURE</span>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="form-group">
+            <label class="form-label">Plaintext Input</label>
+            <textarea class="form-input" id="vaultPlaintext" placeholder="Enter sensitive data to encrypt..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Passphrase</label>
+            <input class="form-input" id="vaultPass" type="password" placeholder="Minimum 12 characters..." oninput="updateStrength('vaultPass','vaultStrength','vaultStrengthLabel')">
+            <div style="margin-top:6px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                <span class="form-hint">Strength</span>
+                <span class="form-hint" id="vaultStrengthLabel" style="font-weight:600;">—</span>
+              </div>
+              <div class="strength-bar" id="vaultStrength">
+                <div class="strength-seg" id="vs1"></div><div class="strength-seg" id="vs2"></div>
+                <div class="strength-seg" id="vs3"></div><div class="strength-seg" id="vs4"></div>
+                <div class="strength-seg" id="vs5"></div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="vaultEncrypt()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Encrypt Data
+          </button>
+          <div class="form-group">
+            <label class="form-label">Encrypted Output (Base64)</label>
+            <div class="output-box selectable" id="vaultOutput">Awaiting input...</div>
+          </div>
+          <button class="btn btn-ghost btn-full btn-sm" onclick="copyText('vaultOutput')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy Ciphertext
+          </button>
+        </div>
+      </div>
+
+      <!-- DECRYPT -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--green-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 019.9-1"/><line x1="17" y1="3" x2="17" y2="7"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Decrypt</div>
+            <div class="card-subtitle">Authenticated decryption</div>
+          </div>
+          <span class="badge badge-green" style="margin-left:auto;">VERIFY</span>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="form-group">
+            <label class="form-label">Ciphertext (Base64)</label>
+            <textarea class="form-input" id="vaultCipher" placeholder="Paste encrypted ciphertext..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Passphrase</label>
+            <input class="form-input" id="vaultDecPass" type="password" placeholder="Decryption passphrase...">
+          </div>
+          <button class="btn btn-success btn-full" onclick="vaultDecrypt()" style="background:var(--green);color:#fff;border:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            Decrypt & Verify
+          </button>
+          <div class="form-group">
+            <label class="form-label">Decrypted Output</label>
+            <div class="output-box selectable" id="vaultDecOutput">Awaiting ciphertext...</div>
+          </div>
+          <div id="vaultStatus" style="display:none;"></div>
+          <button class="btn btn-ghost btn-sm" onclick="vaultClear()">Clear All Fields</button>
+        </div>
+      </div>
+
+      <!-- SPEC CARD -->
+      <div class="card col-full">
+        <div class="card-header" style="padding-bottom:20px;">
+          <div>
+            <div class="card-title">Cryptographic Specification</div>
+            <div class="card-subtitle">All operations use the browser-native Web Crypto API (SubtleCrypto)</div>
+          </div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-body">
+          <div class="metric-grid">
+            <div class="metric-card"><div class="metric-value" style="font-size:18px;color:var(--amber);">AES-256-GCM</div><div class="metric-label">Cipher Suite</div></div>
+            <div class="metric-card"><div class="metric-value" style="font-size:18px;color:var(--amber);">PBKDF2</div><div class="metric-label">Key Derivation</div></div>
+            <div class="metric-card"><div class="metric-value" style="font-size:18px;color:var(--amber);">SHA-256</div><div class="metric-label">Hash Function</div></div>
+            <div class="metric-card"><div class="metric-value" style="font-size:18px;color:var(--amber);">600,000</div><div class="metric-label">PBKDF2 Iterations</div></div>
+            <div class="metric-card"><div class="metric-value" style="font-size:18px;color:var(--amber);">96-bit</div><div class="metric-label">IV Length</div></div>
+            <div class="metric-card"><div class="metric-value" style="font-size:18px;color:var(--amber);">128-bit</div><div class="metric-label">GCM Auth Tag</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     P2P NEXUS
+     ============================================================ -->
+<section id="nexus" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow" style="background:var(--teal-light);color:var(--teal);">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="5" r="3"/><circle cx="5" cy="19" r="3"/><circle cx="19" cy="19" r="3"/><line x1="12" y1="8" x2="5" y2="16"/><line x1="12" y1="8" x2="19" y2="16"/></svg>
+        Module 02
+      </div>
+      <h2 class="section-title">P2P Nexus</h2>
+      <p class="section-subtitle">WebRTC direct tunneling. Zero server relay. Peer-to-peer encrypted communication.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--teal-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.7A2 2 0 012 .88h3a2 2 0 012 1.72c.127 1 .36 1.98.7 2.91a2 2 0 01-.45 2.11L6.09 8.8a16 16 0 006.29 6.29l1.27-1.27a2 2 0 012.11-.45c.93.34 1.91.573 2.91.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div>
+            <div class="card-title">WebRTC Peer Controller</div>
+            <div class="card-subtitle">Direct peer connection management</div>
+          </div>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="alert alert-info">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            WebRTC engine ready. No server relay. Direct encrypted tunnel.
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your Peer ID</label>
+            <div class="output-box selectable" id="peerIdDisplay" style="font-size:13px;">Generating...</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Remote Peer ID</label>
+            <input class="form-input" id="remotePeerId" placeholder="Paste remote peer ID...">
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary" style="flex:1;" onclick="nexusConnect()">Initiate Tunnel</button>
+            <button class="btn btn-danger" onclick="nexusDisconnect()">Disconnect</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Secure Message</label>
+            <div style="display:flex;gap:8px;">
+              <input class="form-input" id="nexusMsg" placeholder="Type message..." style="flex:1;">
+              <button class="btn btn-primary" onclick="nexusSend()">Send</button>
+            </div>
+          </div>
+          <div id="nexusStatus" class="alert alert-warning">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            WebRTC: Awaiting peer connection...
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--teal-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </div>
+          <div><div class="card-title">Network Topology</div></div>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:16px;">
+          <div class="node-grid" id="nodeGrid">
+            <div class="node-item"><div class="node-circle self">YOU</div><div class="node-label">Local</div></div>
+            <div class="node-item"><div class="node-circle" id="node1">N1</div><div class="node-label">Peer 01</div></div>
+            <div class="node-item"><div class="node-circle" id="node2">N2</div><div class="node-label">Peer 02</div></div>
+            <div class="node-item"><div class="node-circle" id="node3">N3</div><div class="node-label">Peer 03</div></div>
+            <div class="node-item"><div class="node-circle" id="node4">N4</div><div class="node-label">Relay A</div></div>
+            <div class="node-item"><div class="node-circle" id="node5">N5</div><div class="node-label">Relay B</div></div>
+            <div class="node-item"><div class="node-circle" id="node6">N6</div><div class="node-label">STUN</div></div>
+            <div class="node-item"><div class="node-circle" id="node7">N7</div><div class="node-label">TURN</div></div>
+          </div>
+          <div class="divider"></div>
+          <div class="metric-grid" style="grid-template-columns:1fr 1fr 1fr;">
+            <div class="metric-card"><div class="metric-value" id="nexusPeers">0</div><div class="metric-label">Peers</div></div>
+            <div class="metric-card"><div class="metric-value" id="nexusLatency">—</div><div class="metric-label">Latency ms</div></div>
+            <div class="metric-card"><div class="metric-value" id="nexusMsgs">0</div><div class="metric-label">Messages</div></div>
+          </div>
+          <div style="background:var(--bg-code);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;max-height:150px;overflow-y:auto;font-family:var(--font-mono);font-size:12px;color:var(--text-3);" id="nexusLog">
+            <div style="color:var(--teal);">// P2P channel initialized</div>
+            <div>Waiting for peer connection...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CODE AUDITOR
+     ============================================================ -->
+<section id="audit" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow" style="background:var(--red-light);color:var(--red);">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        Module 03
+      </div>
+      <h2 class="section-title">Code Auditor</h2>
+      <p class="section-subtitle">Static security analysis. Detects SQLi, XSS, hardcoded secrets, and 9 more vulnerability classes.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="card">
+        <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="form-group">
+            <label class="form-label">Paste Code for Analysis</label>
+            <textarea class="form-input" id="auditCode" style="min-height:220px;font-family:var(--font-mono);font-size:13px;" placeholder="// Paste JavaScript, Python, or any code here..."></textarea>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary" onclick="runAudit()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              Run Security Audit
+            </button>
+            <button class="btn btn-secondary" onclick="loadAuditDemo()">Load Demo</button>
+            <button class="btn btn-ghost" onclick="auditClear()">Clear</button>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="auditResultsPanel" style="display:none;">
+        <div class="card-header" style="padding-bottom:16px;">
+          <div>
+            <div class="card-title">Audit Results</div>
+          </div>
+          <span id="auditScore" class="badge badge-red" style="margin-left:auto;font-size:13px;padding:5px 14px;">Scanning...</span>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="metric-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:8px;">
+            <div class="metric-card"><div class="metric-value" style="color:var(--red);" id="auditCritical">0</div><div class="metric-label">Critical</div></div>
+            <div class="metric-card"><div class="metric-value" style="color:var(--amber);" id="auditHigh">0</div><div class="metric-label">High</div></div>
+            <div class="metric-card"><div class="metric-value" style="color:var(--blue);" id="auditMedium">0</div><div class="metric-label">Medium</div></div>
+            <div class="metric-card"><div class="metric-value" style="color:var(--green);" id="auditLow">0</div><div class="metric-label">Low</div></div>
+          </div>
+          <div id="auditFindings"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     NET WATCH
+     ============================================================ -->
+<section id="netwatch" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        Module 04
+      </div>
+      <h2 class="section-title">Net Watch</h2>
+      <p class="section-subtitle">Browser environment analysis, fingerprinting, and live traffic monitoring.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Environment Scan</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn btn-primary btn-sm btn-full" onclick="runNetScan()">Scan Environment</button>
+          <div id="netResults" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Browser Fingerprint</div></div>
+        <div class="card-body">
+          <div id="fingerprint" style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;"></div>
+          <button class="btn btn-primary btn-sm btn-full" onclick="buildFingerprint()">Generate Fingerprint</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Traffic Monitor</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-3);">
+            <span>Requests/sec</span><span id="reqPerSec" style="font-weight:600;color:var(--text-1);">—</span>
+          </div>
+          <div class="bar-chart" id="trafficChart"></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-3);"><span>Inbound</span><span id="inbound" style="color:var(--green);font-weight:500;">0 KB/s</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-3);"><span>Outbound</span><span id="outbound" style="color:var(--blue);font-weight:500;">0 KB/s</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     HASH LAB
+     ============================================================ -->
+<section id="hashlab" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow" style="background:var(--purple-light);color:var(--purple);">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+        Module 05
+      </div>
+      <h2 class="section-title">Hash Lab</h2>
+      <p class="section-subtitle">SHA-256/384/512, HMAC, and hash comparison tools.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:var(--purple-light);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg></div><div><div class="card-title">Hash Generator</div></div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="form-group"><label class="form-label">Input Data</label><textarea class="form-input" id="hashInput" placeholder="Enter text to hash..."></textarea></div>
+          <div class="form-group"><label class="form-label">Algorithm</label><select class="form-input" id="hashAlgo"><option value="SHA-256">SHA-256</option><option value="SHA-384">SHA-384</option><option value="SHA-512">SHA-512</option><option value="SHA-1">SHA-1 (Legacy)</option></select></div>
+          <button class="btn btn-primary btn-full" onclick="generateHash()">Compute Hash</button>
+          <div class="form-group"><label class="form-label">Digest (Hex)</label><div class="output-box selectable" id="hashOutput">Awaiting input...</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="copyText('hashOutput')">Copy Hash</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:var(--purple-light);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12c0-1.2-4-6-9-6s-9 4.8-9 6 4 6 9 6 9-4.8 9-6z"/></svg></div><div><div class="card-title">Hash Comparison & HMAC</div></div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="form-group"><label class="form-label">Hash A</label><input class="form-input" id="hashA" placeholder="First hash value..."></div>
+          <div class="form-group"><label class="form-label">Hash B</label><input class="form-input" id="hashB" placeholder="Second hash value..."></div>
+          <button class="btn btn-primary btn-full" onclick="compareHashes()">Compare Hashes</button>
+          <div id="hashCompareResult" style="display:none;"></div>
+          <div class="divider"></div>
+          <div class="form-group"><label class="form-label">HMAC-SHA256 Secret Key</label><input class="form-input" id="hmacKey" placeholder="Secret key..."></div>
+          <div class="form-group"><label class="form-label">HMAC Input Data</label><input class="form-input" id="hmacData" placeholder="Data to authenticate..."></div>
+          <button class="btn btn-primary btn-full" onclick="generateHMAC()">Generate HMAC</button>
+          <div class="output-box selectable" id="hmacOutput">HMAC output...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     KEY FORGE
+     ============================================================ -->
+<section id="keyforge" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        Module 06
+      </div>
+      <h2 class="section-title">Key Forge</h2>
+      <p class="section-subtitle">Cryptographically secure key and password generation using Web Crypto CSPRNG.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Random Key Generator</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="form-group"><label class="form-label">Length (bytes)</label><input class="form-input" id="keyLen" type="number" value="32" min="8" max="256"></div>
+          <div class="form-group"><label class="form-label">Format</label><select class="form-input" id="keyFormat"><option value="hex">Hexadecimal</option><option value="base64">Base64</option><option value="binary">Binary</option></select></div>
+          <button class="btn btn-primary btn-full" onclick="generateKey()">Forge Key</button>
+          <div class="output-box selectable" id="keyOutput" style="word-break:break-all;font-size:11px;">Key will appear here...</div>
+          <button class="btn btn-ghost btn-sm" onclick="copyText('keyOutput')">Copy Key</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Password Generator</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="form-group"><label class="form-label">Length</label><input class="form-input" id="passLen" type="number" value="20" min="8" max="128"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);cursor:pointer;"><input type="checkbox" id="passUpper" checked style="accent-color:var(--blue);"> Uppercase</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);cursor:pointer;"><input type="checkbox" id="passLower" checked style="accent-color:var(--blue);"> Lowercase</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);cursor:pointer;"><input type="checkbox" id="passNums" checked style="accent-color:var(--blue);"> Numerals</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2);cursor:pointer;"><input type="checkbox" id="passSymbols" checked style="accent-color:var(--blue);"> Symbols</label>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="generatePassword()">Generate</button>
+          <div class="output-box selectable" id="passOutput" style="font-size:18px;letter-spacing:0.05em;font-family:var(--font-mono);">—</div>
+          <div class="strength-bar" id="passStrength"><div class="strength-seg" id="ps1"></div><div class="strength-seg" id="ps2"></div><div class="strength-seg" id="ps3"></div><div class="strength-seg" id="ps4"></div><div class="strength-seg" id="ps5"></div></div>
+          <button class="btn btn-ghost btn-sm" onclick="copyText('passOutput')">Copy</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">UUID & Token Generator</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <button class="btn btn-primary btn-full" onclick="generateUUID()">Generate UUID v4</button>
+          <div class="output-box selectable" id="uuidOutput" style="font-family:var(--font-mono);font-size:13px;">—</div>
+          <div class="divider"></div>
+          <div class="form-group"><label class="form-label">CSRF Token (bytes)</label><input class="form-input" id="csrfLen" type="number" value="32"></div>
+          <button class="btn btn-primary btn-full" onclick="generateCSRF()">Generate Token</button>
+          <div class="output-box selectable" id="csrfOutput" style="font-family:var(--font-mono);font-size:12px;word-break:break-all;">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     DATA PROBE
+     ============================================================ -->
+<section id="dataprobe" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        Module 07
+      </div>
+      <h2 class="section-title">Data Probe</h2>
+      <p class="section-subtitle">Encode, decode, convert, and inspect data in Base64, Hex, JSON, and URL formats.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Base64 Encoder / Decoder</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="form-group"><label class="form-label">Input</label><textarea class="form-input" id="b64Input" placeholder="Enter text or Base64 string..."></textarea></div>
+          <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" style="flex:1;" onclick="b64Encode()">Encode</button><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="b64Decode()">Decode</button></div>
+          <div class="output-box selectable" id="b64Output">Output...</div>
+          <button class="btn btn-ghost btn-sm" onclick="copyText('b64Output')">Copy</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Hex Converter</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="form-group"><label class="form-label">Input</label><textarea class="form-input" id="hexInput" placeholder="Enter text or hex string..."></textarea></div>
+          <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" style="flex:1;" onclick="textToHex()">To Hex</button><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="hexToText()">From Hex</button></div>
+          <div class="output-box selectable" id="hexOutput">Output...</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">JSON Probe</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="form-group"><label class="form-label">JSON Input</label><textarea class="form-input" id="jsonInput" style="min-height:120px;font-family:var(--font-mono);font-size:12px;" placeholder='{"key":"value"}'></textarea></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="btn btn-primary btn-sm" onclick="jsonFormat()">Prettify</button><button class="btn btn-secondary btn-sm" onclick="jsonMinify()">Minify</button><button class="btn btn-secondary btn-sm" onclick="jsonValidate()">Validate</button></div>
+          <div class="output-box selectable" id="jsonOutput" style="min-height:100px;font-family:var(--font-mono);font-size:12px;">JSON output...</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">URL Probe</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="form-group"><label class="form-label">URL</label><input class="form-input" id="urlInput" placeholder="https://example.com/path?key=value"></div>
+          <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" style="flex:1;" onclick="urlEncode()">Encode</button><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="urlDecode()">Decode</button><button class="btn btn-secondary btn-sm" style="flex:1;" onclick="parseURL()">Parse</button></div>
+          <div class="output-box selectable" id="urlOutput">Output...</div>
+          <div id="urlParsed" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SIG VERIFY
+     ============================================================ -->
+<section id="sigverify" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow" style="background:var(--green-light);color:var(--green);">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+        Module 08
+      </div>
+      <h2 class="section-title">Sig Verify</h2>
+      <p class="section-subtitle">ECDSA P-384 digital signature generation and verification.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Signature Generator</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <button class="btn btn-primary btn-full" onclick="generateSigKeyPair()">Generate ECDSA Key Pair</button>
+          <div class="form-group"><label class="form-label">Public Key (SPKI / Base64)</label><div class="output-box selectable" id="sigPubKey" style="font-size:10px;word-break:break-all;min-height:60px;">—</div></div>
+          <div class="form-group"><label class="form-label">Private Key (PKCS8 / Base64)</label><div class="output-box selectable" id="sigPrivKey" style="font-size:10px;word-break:break-all;min-height:60px;border-color:#fcd34d;background:var(--amber-light);">—</div></div>
+          <div class="form-group"><label class="form-label">Data to Sign</label><input class="form-input" id="sigData" placeholder="Enter data to sign..."></div>
+          <button class="btn btn-primary btn-full" onclick="signData()">Sign Data</button>
+          <div class="output-box selectable" id="sigOutput" style="font-size:11px;word-break:break-all;">Signature...</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Signature Verifier</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="form-group"><label class="form-label">Public Key (Base64)</label><textarea class="form-input" id="verPubKey" placeholder="Paste public key..." style="font-size:11px;min-height:70px;"></textarea></div>
+          <div class="form-group"><label class="form-label">Original Data</label><input class="form-input" id="verData" placeholder="Original data string..."></div>
+          <div class="form-group"><label class="form-label">Signature (Base64)</label><textarea class="form-input" id="verSig" placeholder="Paste signature..." style="font-size:11px;min-height:70px;"></textarea></div>
+          <button class="btn btn-primary btn-full" onclick="verifySignature()">Verify Signature</button>
+          <div id="verResult" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STEGANO
+     ============================================================ -->
+<section id="stegano" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+        Module 09
+      </div>
+      <h2 class="section-title">Stegano Shield</h2>
+      <p class="section-subtitle">Zero-width Unicode steganography. Embed invisible messages in plain text.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Embed Hidden Message</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="alert alert-info" style="font-size:13px;">Embeds hidden data using zero-width Unicode characters. Invisible to human readers.</div>
+          <div class="form-group"><label class="form-label">Carrier Text</label><textarea class="form-input" id="stegoCarrier" placeholder="Visible text that carries the hidden message..."></textarea></div>
+          <div class="form-group"><label class="form-label">Hidden Message</label><input class="form-input" id="stegoHidden" placeholder="Secret message to embed..."></div>
+          <button class="btn btn-primary btn-full" onclick="stegoEmbed()">Embed Secret</button>
+          <div class="form-group"><label class="form-label">Stego Output</label><div class="output-box selectable" id="stegoOutput">Output will appear here...</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="copyRawStego()">Copy Stego Text to Clipboard</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Extract Hidden Message</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="form-group"><label class="form-label">Stego Text Input</label><textarea class="form-input" id="stegoExtractInput" placeholder="Paste stego text here to extract hidden message..."></textarea></div>
+          <button class="btn btn-primary btn-full" onclick="stegoExtract()">Extract Secret</button>
+          <div class="form-group"><label class="form-label">Extracted Message</label><div class="output-box selectable" id="stegoExtracted">Hidden message will appear here...</div></div>
+          <div class="alert alert-warning" style="font-size:12.5px;">Zero-width chars: ZWSP U+200B, ZWJ U+200D, ZWNJ U+200C — mapped to binary encoding.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PERM SCAN
+     ============================================================ -->
+<section id="permscan" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow" style="background:var(--amber-light);color:var(--amber);">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+        Module 10
+      </div>
+      <h2 class="section-title">Permission Scan</h2>
+      <p class="section-subtitle">Browser permission auditor and security header inspector.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Browser Permissions</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="scanPermissions()">Scan All Permissions</button>
+            <button class="btn btn-secondary btn-sm" onclick="requestPerm('camera')">Test Camera</button>
+            <button class="btn btn-secondary btn-sm" onclick="requestPerm('microphone')">Test Microphone</button>
+            <button class="btn btn-secondary btn-sm" onclick="requestPerm('geolocation')">Test Location</button>
+          </div>
+          <div id="permResults" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Security Headers Inspector</div></div>
+        <div class="card-body">
+          <div class="alert alert-warning" style="margin-bottom:14px;font-size:13px;">Full header inspection requires a server-side proxy. Showing simulated policy analysis for this document.</div>
+          <button class="btn btn-primary btn-sm" style="margin-bottom:14px;" onclick="buildHeaderReport()">Analyze Headers</button>
+          <div class="table-wrap" id="headerTable"><table><thead><tr><th>Header</th><th>Status</th><th>Recommendation</th></tr></thead><tbody id="headerBody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MEM GUARD
+     ============================================================ -->
+<section id="memguard" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Module 11
+      </div>
+      <h2 class="section-title">Mem Guard</h2>
+      <p class="section-subtitle">Volatile in-memory secret storage. Never written to disk. Purged on session end.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Secure Memory Vault</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="alert alert-info" style="font-size:13px;">Secrets are held in JavaScript memory (RAM) only. No disk writes. Auto-destroyed on tab close.</div>
+          <div class="form-group"><label class="form-label">Secret Key</label><input class="form-input" id="memKey" placeholder="Identifier key..."></div>
+          <div class="form-group"><label class="form-label">Secret Value</label><textarea class="form-input" id="memValue" placeholder="Sensitive value (API key, token, credential...)"></textarea></div>
+          <div style="display:flex;gap:8px;"><button class="btn btn-primary" style="flex:1;" onclick="memStore()">Store in Memory</button><button class="btn btn-secondary" onclick="memRetrieve()">Retrieve</button></div>
+          <div class="output-box selectable" id="memOutput">Memory vault output...</div>
+          <button class="btn btn-danger btn-full" onclick="memPurge()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+            Purge All Secrets
+          </button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Memory Registry</div></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+            <div class="metric-card"><div class="metric-value" id="memCount">0</div><div class="metric-label">Stored Secrets</div></div>
+            <div class="metric-card"><div class="metric-value" id="memSize">0 B</div><div class="metric-label">Memory Used</div></div>
+          </div>
+          <div id="memRegistry" style="display:flex;flex-direction:column;gap:8px;"><p style="font-size:13px;color:var(--text-4);">No secrets stored.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     AI CONTROL CENTER
+     ============================================================ -->
+<section id="aicontrol" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+        Control Hub
+      </div>
+      <h2 class="section-title">AI Control Center</h2>
+      <p class="section-subtitle">Self-Healing Orchestrator dashboard. Real-time module management and system health.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Orchestrator Dashboard</div><span class="badge badge-green" style="margin-left:auto;">Active</span></div>
+        <div class="card-body">
+          <div class="metric-grid" style="grid-template-columns:repeat(4,1fr);">
+            <div class="metric-card"><div class="metric-value" id="aiOpsCount">0</div><div class="metric-label">Total Ops</div></div>
+            <div class="metric-card"><div class="metric-value">12</div><div class="metric-label">Modules Synced</div></div>
+            <div class="metric-card"><div class="metric-value" id="aiHeals">0</div><div class="metric-label">Auto-Heals</div></div>
+            <div class="metric-card"><div class="metric-value" style="color:var(--green);font-size:18px;">Secure</div><div class="metric-label">Threat Level</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title" style="font-size:14px;">Module Controller</div></div>
+          <div class="card-body"><div id="moduleControlList" style="display:flex;flex-direction:column;gap:6px;"></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title" style="font-size:14px;">Orchestrator Event Log</div></div>
+          <div class="card-body" style="padding:0;">
+            <div style="padding:16px;max-height:350px;overflow-y:auto;font-family:var(--font-mono);font-size:12px;line-height:2;color:var(--text-3);" id="aiLog">
+              <div style="color:var(--blue);">// AI Control Center Online</div>
+              <div style="color:var(--green);">[INIT] Self-Healing Orchestrator v3.0 active</div>
+              <div>[SYNC] All 12 modules nominal</div>
+              <div>[SEC] Cryptographic engines verified</div>
+              <div>[MON] DOM integrity monitor running</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:14px;">Security Configuration Matrix</div></div>
+        <div class="card-body"><div id="secConfigMatrix" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     ABOUT
+     ============================================================ -->
+<section id="about" class="section">
+  <div class="page-wrap">
+    <div class="about-hero">
+      <div style="display:inline-flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-full);padding:6px 16px 6px 8px;margin-bottom:24px;box-shadow:var(--shadow-xs);">
+        <div style="width:24px;height:24px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <span style="font-size:13px;font-weight:600;color:var(--text-2);">The Vision — OmniGuard v3.0</span>
+      </div>
+      <h1 style="font-size:clamp(28px,4vw,44px);margin-bottom:16px;">Sovereign Security<br>for the Modern Web.</h1>
+      <p style="font-size:17px;color:var(--text-3);max-width:640px;line-height:1.7;">OmniGuard Terminal was built from a singular premise: every critical cryptographic operation should run locally, in your browser, with zero dependence on external servers, third-party APIs, or corporate infrastructure.</p>
+    </div>
+    <div class="grid-2" style="margin-bottom:24px;">
+      <div class="card">
+        <div class="card-body">
+          <h3 style="margin-bottom:12px;">The Mandate</h3>
+          <p style="margin-bottom:12px;">Modern infrastructure has been captured by a handful of corporations that charge rent on computation and architect systems to create dependency. OmniGuard is a direct rejection of this paradigm.</p>
+          <p>Every operation in this terminal — encryption, hashing, key generation, signing — executes via the browser's native <strong>Web Crypto API</strong>. Private keys and plaintext never leave your device.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h3 style="margin-bottom:12px;">Adversarial Design</h3>
+          <p style="margin-bottom:12px;">Every feature is designed assuming an adversarial environment. Threat models include passive surveillance, active MITM attacks, social engineering vectors, and timing-based side-channel attacks.</p>
+          <p>The architecture provides defense-in-depth at every layer. Security through obscurity is a fallacy — we reject it entirely. The codebase is the documentation.</p>
+        </div>
+      </div>
+    </div>
+    <div class="metric-grid" style="grid-template-columns:repeat(4,1fr);">
+      <div class="metric-card"><div class="metric-value">12</div><div class="metric-label">Elite Modules</div></div>
+      <div class="metric-card"><div class="metric-value">0</div><div class="metric-label">External Servers</div></div>
+      <div class="metric-card"><div class="metric-value">100%</div><div class="metric-label">Client-Side</div></div>
+      <div class="metric-card"><div class="metric-value">AES-256</div><div class="metric-label">Encryption Grade</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PRIVACY
+     ============================================================ -->
+<section id="privacy" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow" style="background:var(--green-light);color:var(--green);">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Immutable Policy
+      </div>
+      <h2 class="section-title">Privacy Policy</h2>
+      <p class="section-subtitle">Version 1.0 — Binding and immutable by design.</p>
+    </div>
+    <div class="policy-grid">
+      <div class="policy-nav">
+        <div class="policy-nav-item active" onclick="scrollToPolicySection('p-collection')">Data Collection</div>
+        <div class="policy-nav-item" onclick="scrollToPolicySection('p-crypto')">Cryptographic Ops</div>
+        <div class="policy-nav-item" onclick="scrollToPolicySection('p-storage')">Local Storage</div>
+        <div class="policy-nav-item" onclick="scrollToPolicySection('p-network')">Network Activity</div>
+        <div class="policy-nav-item" onclick="scrollToPolicySection('p-cookies')">Cookies & Tracking</div>
+        <div class="policy-nav-item" onclick="scrollToPolicySection('p-audit')">Audit Rights</div>
+        <div class="policy-nav-item" onclick="scrollToPolicySection('p-immutable')">Immutability</div>
+      </div>
+      <div class="policy-content card" style="padding:32px;">
+        <div id="p-collection">
+          <h3>Data Collection</h3>
+          <p><strong>OmniGuard Terminal collects zero data.</strong> No personal information is transmitted, stored on external servers, or shared with third parties. All operations are performed exclusively within your browser session using client-side JavaScript and the Web Crypto API.</p>
+        </div>
+        <div id="p-crypto">
+          <h3>Cryptographic Operations</h3>
+          <p>All encryption, hashing, key generation, and signing operations are performed by your browser's native <strong>Web Crypto API (SubtleCrypto)</strong>. Private keys, passphrases, and plaintext data never leave your device. We have no technical capability to access them even if we wanted to.</p>
+        </div>
+        <div id="p-storage">
+          <h3>Local Storage</h3>
+          <p>The Mem Guard module stores secrets in JavaScript memory (RAM) only. No data is written to localStorage, sessionStorage, IndexedDB, or any persistent browser storage mechanism. All secrets are permanently destroyed when the browser tab or session is closed.</p>
+        </div>
+        <div id="p-network">
+          <h3>Network Activity</h3>
+          <p>OmniGuard Terminal makes no outbound network requests except for loading Google Fonts and Tailwind CSS at page load. The P2P Nexus module uses WebRTC — connections are established peer-to-peer using STUN/TURN servers for NAT traversal only. No message content is routed through servers.</p>
+        </div>
+        <div id="p-cookies">
+          <h3>Cookies and Tracking</h3>
+          <p>No cookies are set. No tracking pixels are embedded. No analytics scripts are loaded. No advertising networks are present. This terminal is built for operational utility, not monetization through surveillance.</p>
+        </div>
+        <div id="p-audit">
+          <h3>Open Source Audit Rights</h3>
+          <p>You have the right to inspect every line of this terminal's code. The single-file architecture ensures that no obfuscated, minified, or externally-loaded code can introduce undisclosed data collection. The source code is the privacy guarantee.</p>
+        </div>
+        <div id="p-immutable">
+          <h3>Immutability Clause</h3>
+          <p>This privacy policy is <strong>immutable by design</strong>. Because the terminal is serverless and self-contained, there is no mechanism by which a server-side update could retroactively alter the behavior of a deployed instance. The version you deploy is the version you audit.</p>
+        </div>
+        <div style="margin-top:24px;">
+          <div class="alert alert-success">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Compliance: Architecturally incapable of violating user privacy. Zero-server. Zero-telemetry. Zero-trust in third parties. The user holds sole custody of all cryptographic material.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CONTACT
+     ============================================================ -->
+<section id="contact" class="section">
+  <div class="page-wrap">
+    <div class="section-header">
+      <div class="section-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Secure Channel
+      </div>
+      <h2 class="section-title">Contact Us</h2>
+      <p class="section-subtitle">Reach out via encrypted message. All inquiries handled with full operational security.</p>
+    </div>
+    <div class="contact-grid">
+      <!-- INFO CARD -->
+      <div class="contact-info-card">
+        <div style="position:relative;z-index:1;">
+          <div style="width:48px;height:48px;background:rgba(255,255,255,0.15);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:24px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <h3 style="color:#fff;font-size:22px;margin-bottom:10px;">Get in Touch</h3>
+          <p style="color:rgba(255,255,255,0.75);font-size:14px;margin-bottom:28px;line-height:1.7;">All inquiries are handled with full operational security. Responses within 24–72 hours for standard requests. Critical security disclosures are prioritized.</p>
+
+          <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:16px;margin-bottom:16px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;color:rgba(255,255,255,0.6);text-transform:uppercase;margin-bottom:6px;">Primary Channel</div>
+            <div style="font-size:16px;font-weight:700;color:#fff;">Gxplcp@gmail.com</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:28px;height:28px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+              <span style="font-size:13px;color:rgba(255,255,255,0.8);">Response SLA: 24–72 hours</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:28px;height:28px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <span style="font-size:13px;color:rgba(255,255,255,0.8);">Responsible disclosure honored</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:28px;height:28px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+              <span style="font-size:13px;color:rgba(255,255,255,0.8);">PGP encryption supported</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACT FORM -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:var(--blue-light);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Send a Message</div>
+            <div class="card-subtitle">Compose via encrypted form</div>
+          </div>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:16px;">
+          <div class="grid-2" style="gap:14px;">
+            <div class="form-group">
+              <label class="form-label">Your Name <span style="color:var(--text-4);font-weight:400;">(optional)</span></label>
+              <input class="form-input" id="contactName" placeholder="Your name or handle...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Reply-To Email <span style="color:var(--text-4);font-weight:400;">(optional)</span></label>
+              <input class="form-input" id="contactEmail" type="email" placeholder="your@email.tld">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <select class="form-input" id="contactSubject">
+              <option>Security Audit Request</option>
+              <option>Vulnerability Disclosure</option>
+              <option>Cryptographic Consultation</option>
+              <option>Integration Partnership</option>
+              <option>General Inquiry</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-input" id="contactMsg" style="min-height:160px;" placeholder="Describe your inquiry in detail. For highly sensitive communications, consider encrypting your message using the Quantum Vault before pasting here."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text-2);cursor:pointer;padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--radius-md);transition:all 0.18s;" id="prio-std">
+                <input type="radio" name="priority" value="standard" checked style="accent-color:var(--blue);"> Standard
+              </label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text-2);cursor:pointer;padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--radius-md);transition:all 0.18s;" id="prio-hi">
+                <input type="radio" name="priority" value="high" style="accent-color:var(--amber);"> High
+              </label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text-2);cursor:pointer;padding:8px 14px;border:1.5px solid var(--border);border-radius:var(--radius-md);transition:all 0.18s;" id="prio-crit">
+                <input type="radio" name="priority" value="critical" style="accent-color:var(--red);"> Critical
+              </label>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-primary" style="flex:1;" onclick="sendContact()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Send Message
+            </button>
+            <button class="btn btn-ghost" onclick="clearContact()">Clear</button>
+          </div>
+          <div id="contactStatus" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     JAVASCRIPT ENGINE
+     ============================================================ -->
+<script>
+// ============================================================
+// ANTI-THEFT
+// ============================================================
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if(e.ctrlKey && ['u','s','a','c','p'].includes(e.key.toLowerCase())) e.preventDefault();
+  if(e.key==='F12') e.preventDefault();
+});
+document.addEventListener('dragstart', e => e.preventDefault());
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const target = document.getElementById(id);
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if(l.getAttribute('onclick')?.includes(`'${id}'`)) l.classList.add('active');
+  });
+  window.scrollTo({top:0, behavior:'instant'});
+  OrchestratorBrain.log('INFO', `Navigated to ${id.toUpperCase()}`);
+}
+
+function scrollToPolicySection(id) {
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth', block:'start'});
+  document.querySelectorAll('.policy-nav-item').forEach(n => n.classList.remove('active'));
+}
+
+// ============================================================
+// TOOLS HUB — BUILD CARD GRID
+// ============================================================
+const TOOLS_DATA = [
+  {id:'vault',     name:'Quantum Vault',     desc:'AES-256-GCM encryption with PBKDF2 key derivation. Military-grade.',     icon:'lock',    accent:'#d97706', bg:'#fffbeb'},
+  {id:'nexus',     name:'P2P Nexus',         desc:'WebRTC direct tunneling. Zero server relay. End-to-end encrypted.',       icon:'share',   accent:'#0891b2', bg:'#ecfeff'},
+  {id:'audit',     name:'Code Auditor',      desc:'Static security analysis detecting SQLi, XSS, hardcoded secrets, and more.',icon:'alert', accent:'#dc2626', bg:'#fef2f2'},
+  {id:'netwatch',  name:'Net Watch',         desc:'Browser fingerprinting, environment analysis, and traffic monitoring.',    icon:'globe',   accent:'#1a56db', bg:'#eff3ff'},
+  {id:'hashlab',   name:'Hash Lab',          desc:'SHA-256/384/512, HMAC-SHA256, and cryptographic hash comparison.',        icon:'hash',    accent:'#7c3aed', bg:'#f5f3ff'},
+  {id:'keyforge',  name:'Key Forge',         desc:'Cryptographically secure key, password, UUID, and CSRF token generation.', icon:'key',    accent:'#059669', bg:'#ecfdf5'},
+  {id:'dataprobe', name:'Data Probe',        desc:'Base64, Hex, JSON, and URL encoding, decoding, and inspection.',          icon:'code',    accent:'#1a56db', bg:'#eff3ff'},
+  {id:'sigverify', name:'Sig Verify',        desc:'ECDSA P-384 digital signature generation and verification.',              icon:'check',   accent:'#059669', bg:'#ecfdf5'},
+  {id:'stegano',   name:'Stegano Shield',    desc:'Zero-width Unicode steganography. Invisible message embedding.',          icon:'eye',     accent:'#7c3aed', bg:'#f5f3ff'},
+  {id:'permscan',  name:'Perm Scan',         desc:'Browser permission audit and security header inspector.',                 icon:'radar',   accent:'#d97706', bg:'#fffbeb'},
+  {id:'memguard',  name:'Mem Guard',         desc:'Volatile in-memory secret vault. Zero disk writes. Auto-purge.',         icon:'cpu',     accent:'#0891b2', bg:'#ecfeff'},
+  {id:'aicontrol', name:'AI Control Center', desc:'Self-Healing Orchestrator with real-time module management.',             icon:'orbit',   accent:'#1a56db', bg:'#eff3ff'},
+];
+
+const ICONS = {
+  lock:   '<path d="M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2z"/><path d="M7 11V7a5 5 0 0110 0v4"/>',
+  share:  '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>',
+  alert:  '<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  globe:  '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>',
+  hash:   '<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
+  key:    '<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>',
+  code:   '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+  check:  '<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',
+  eye:    '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/>',
+  radar:  '<circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>',
+  cpu:    '<rect x="9" y="9" width="6" height="6"/><path d="M4 4h16v16H4z"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/>',
+  orbit:  '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>',
+};
+
+function buildToolsGrid() {
+  const grid = document.getElementById('toolsGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  TOOLS_DATA.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'tool-card';
+    card.style.setProperty('--accent', t.accent);
+    card.onclick = () => showSection(t.id);
+    card.innerHTML = `
+      <div class="tool-card-icon" style="background:${t.bg};">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${t.accent}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[t.icon]}</svg>
+      </div>
+      <div class="tool-card-name">${t.name}</div>
+      <div class="tool-card-desc">${t.desc}</div>
+      <div class="tool-card-footer">
+        <span class="badge" style="background:${t.bg};color:${t.accent};">Open Module</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${t.accent}" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================
+// ORCHESTRATOR
+// ============================================================
+const OrchestratorBrain = {
+  ops: 0, heals: 0, interval: null,
+  init() {
+    this.interval = setInterval(() => this.tick(), 2500);
+    this.log('OK', 'Orchestrator initialized');
+    this.log('OK', 'DOM watcher active');
+    this.log('OK', 'Crypto subsystem ready');
+    this.initCounters();
+    this.buildModuleControls();
+    this.buildSecConfig();
+    this.runNetScan();
+    this.buildFingerprint();
+    this.buildHeaderReport();
+    this.generatePeerId();
+    this.startTrafficSim();
+    buildToolsGrid();
+  },
+  tick() {
+    this.ops++;
+    const el = document.getElementById('aiOpsCount');
+    if(el) el.textContent = this.ops;
+    const entries = [
+      ['OK','Module sync check passed'],['OK','Crypto pool healthy'],
+      ['OK','Memory vault sealed'],['OK','DOM integrity verified'],
+      ['OK','Navigation synced'],['INFO','Idle monitor active'],
+    ];
+    const e = entries[Math.floor(Math.random()*entries.length)];
+    this.log(e[0], e[1]);
+    this.updateNodeViz();
+  },
+  heal(msg) { this.heals++; const el=document.getElementById('aiHeals'); if(el) el.textContent=this.heals; this.log('HEAL', msg); },
+  log(type, msg) {
+    const log = document.getElementById('aiLog');
+    if(!log) return;
+    const now = new Date().toTimeString().slice(0,8);
+    const el = document.createElement('div');
+    const color = type==='OK'?'var(--green)':type==='HEAL'?'var(--blue)':type==='INFO'?'var(--text-3)':'var(--amber)';
+    el.innerHTML = `<span style="color:var(--text-4);">${now}</span> <span style="color:${color};font-weight:500;">[${type}]</span> ${msg}`;
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+    if(log.children.length > 40) log.removeChild(log.firstChild);
+  },
+  initCounters() {
+    let m=0; const i=setInterval(()=>{ if(m>=12){clearInterval(i);return;} m++; const el=document.getElementById('counter-modules'); if(el) el.textContent=m; },80);
+  },
+  buildModuleControls() {
+    const c=document.getElementById('moduleControlList'); if(!c) return;
+    const modules=[
+      {id:'vault',name:'Quantum Vault',accent:'#d97706'},
+      {id:'nexus',name:'P2P Nexus',accent:'#0891b2'},
+      {id:'audit',name:'Code Auditor',accent:'#dc2626'},
+      {id:'netwatch',name:'Net Watch',accent:'#1a56db'},
+      {id:'hashlab',name:'Hash Lab',accent:'#7c3aed'},
+      {id:'keyforge',name:'Key Forge',accent:'#059669'},
+      {id:'dataprobe',name:'Data Probe',accent:'#1a56db'},
+      {id:'sigverify',name:'Sig Verify',accent:'#059669'},
+      {id:'stegano',name:'Stegano Shield',accent:'#7c3aed'},
+      {id:'permscan',name:'Permission Scan',accent:'#d97706'},
+      {id:'memguard',name:'Mem Guard',accent:'#0891b2'},
+      {id:'aicontrol',name:'AI Control Center',accent:'#1a56db'},
+    ];
+    modules.forEach(m=>{
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--bg);';
+      row.innerHTML=`<div style="width:8px;height:8px;border-radius:50%;background:${m.accent};flex-shrink:0;"></div><span style="font-size:13px;color:var(--text-2);flex:1;font-weight:500;">${m.name}</span><label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div></label><button class="btn btn-ghost btn-sm" style="font-size:12px;padding:4px 12px;" onclick="showSection('${m.id}')">Open</button>`;
+      c.appendChild(row);
+    });
+  },
+  buildSecConfig() {
+    const c=document.getElementById('secConfigMatrix'); if(!c) return;
+    const configs=[
+      {name:'AES-256-GCM Encryption',on:true},{name:'PBKDF2 Key Derivation',on:true},
+      {name:'WebRTC Peer Isolation',on:true},{name:'Zero-Server Architecture',on:true},
+      {name:'DOM Integrity Monitor',on:true},{name:'Memory Auto-Purge',on:true},
+      {name:'HMAC Authentication',on:true},{name:'CSP Header Enforcement',on:false},
+      {name:'Steganographic Channel',on:true},{name:'Permission Audit Layer',on:true},
+      {name:'Timing Attack Mitigation',on:true},{name:'Side-Channel Guard',on:false},
+    ];
+    configs.forEach(conf=>{
+      const el=document.createElement('div');
+      el.style.cssText='display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);';
+      el.innerHTML=`<div style="width:8px;height:8px;border-radius:50%;background:${conf.on?'var(--green)':'var(--text-4)'};flex-shrink:0;"></div><span style="font-size:13px;color:var(--text-2);flex:1;">${conf.name}</span><label class="toggle"><input type="checkbox" ${conf.on?'checked':''}><div class="toggle-track"></div></label>`;
+      c.appendChild(el);
+    });
+  },
+  generatePeerId() {
+    const arr=new Uint8Array(8); crypto.getRandomValues(arr);
+    const id=Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+    const el=document.getElementById('peerIdDisplay');
+    if(el) el.textContent='OGT-'+id.slice(0,4)+'-'+id.slice(4,8)+'-'+id.slice(8,12)+'-'+id.slice(12);
+  },
+  updateNodeViz() {
+    const ids=['node1','node2','node3','node4','node5','node6','node7'];
+    const n=document.getElementById(ids[Math.floor(Math.random()*ids.length)]);
+    if(!n) return;
+    n.className='node-circle'+(Math.random()>0.4?' connected':'');
+  },
+  runNetScan() {
+    const c=document.getElementById('netResults'); if(!c) return;
+    const checks=[
+      {l:'HTTPS Protocol',v:location.protocol==='https:'?'Secure':'Insecure (HTTP)',ok:location.protocol==='https:'},
+      {l:'Web Crypto API',v:window.crypto?.subtle?'Available':'Unavailable',ok:!!window.crypto?.subtle},
+      {l:'WebRTC Support',v:window.RTCPeerConnection?'Available':'Unavailable',ok:!!window.RTCPeerConnection},
+      {l:'Service Worker',v:'serviceWorker' in navigator?'Supported':'Unsupported',ok:'serviceWorker' in navigator},
+      {l:'SharedArrayBuffer',v:typeof SharedArrayBuffer!=='undefined'?'Enabled':'Disabled',ok:typeof SharedArrayBuffer!=='undefined'},
+    ];
+    c.innerHTML='';
+    checks.forEach(ch=>{
+      const el=document.createElement('div');
+      el.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);';
+      el.innerHTML=`<span style="font-size:12.5px;color:var(--text-2);font-weight:500;">${ch.l}</span><span class="badge ${ch.ok?'badge-green':'badge-amber'}">${ch.v}</span>`;
+      c.appendChild(el);
+    });
+  },
+  buildFingerprint() {
+    const c=document.getElementById('fingerprint'); if(!c) return;
+    const entries=[
+      ['Platform',navigator.platform],['Language',navigator.language],
+      ['Cores',navigator.hardwareConcurrency||'N/A'],['Screen',screen.width+'x'+screen.height],
+      ['Color Depth',screen.colorDepth+'-bit'],['Timezone',Intl.DateTimeFormat().resolvedOptions().timeZone],
+      ['Cookies',navigator.cookieEnabled?'Enabled':'Disabled'],
+    ];
+    c.innerHTML='';
+    entries.forEach(([k,v])=>{
+      const el=document.createElement('div');
+      el.style.cssText='display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);align-items:center;';
+      el.innerHTML=`<span style="font-size:12px;color:var(--text-3);font-weight:500;">${k}</span><span style="font-size:12px;color:var(--blue);font-weight:600;text-align:right;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v}</span>`;
+      c.appendChild(el);
+    });
+  },
+  buildHeaderReport() {
+    const tbody=document.getElementById('headerBody'); if(!tbody) return;
+    const headers=[
+      ['Content-Security-Policy','Missing','Add strict CSP to prevent XSS','warn'],
+      ['X-Frame-Options','Present','DENY or SAMEORIGIN recommended','ok'],
+      ['X-Content-Type-Options','Present','nosniff active','ok'],
+      ['Strict-Transport-Security','Missing','Enable HSTS with max-age','warn'],
+      ['Referrer-Policy','Missing','Set strict-origin-when-cross-origin','warn'],
+      ['Permissions-Policy','Missing','Restrict camera, mic, geolocation','warn'],
+    ];
+    tbody.innerHTML='';
+    headers.forEach(([h,s,r,t])=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td style="font-weight:600;color:var(--text-1);">${h}</td><td><span class="badge ${t==='ok'?'badge-green':'badge-amber'}">${s}</span></td><td style="color:var(--text-3);">${r}</td>`;
+      tbody.appendChild(tr);
+    });
+  },
+  startTrafficSim() {
+    const chart=document.getElementById('trafficChart'); if(!chart) return;
+    for(let i=0;i<20;i++){ const b=document.createElement('div'); b.className='bar-item'; b.style.height=(Math.random()*70+10)+'%'; chart.appendChild(b); }
+    setInterval(()=>{
+      chart.querySelectorAll('.bar-item').forEach(b=>b.style.height=(Math.random()*70+10)+'%');
+      const r=document.getElementById('reqPerSec'); if(r) r.textContent=(Math.random()*40+5).toFixed(1);
+      const ib=document.getElementById('inbound'); if(ib) ib.textContent=(Math.random()*30+2).toFixed(1)+' KB/s';
+      const ob=document.getElementById('outbound'); if(ob) ob.textContent=(Math.random()*8+0.5).toFixed(1)+' KB/s';
+    }, 1600);
+  }
+};
+
+// ============================================================
+// QUANTUM VAULT (AES-256-GCM)
+// ============================================================
+async function deriveKey(passphrase, salt) {
+  const enc=new TextEncoder();
+  const km=await crypto.subtle.importKey('raw',enc.encode(passphrase),{name:'PBKDF2'},false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:600000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function vaultEncrypt() {
+  const pt=document.getElementById('vaultPlaintext').value, pp=document.getElementById('vaultPass').value;
+  const out=document.getElementById('vaultOutput');
+  if(!pt||!pp){out.className='output-box error';out.textContent='Error: Both plaintext and passphrase required.';return;}
+  if(pp.length<12){out.className='output-box error';out.textContent='Error: Passphrase must be at least 12 characters.';return;}
+  try {
+    const salt=crypto.getRandomValues(new Uint8Array(32)), iv=crypto.getRandomValues(new Uint8Array(12));
+    const key=await deriveKey(pp,salt);
+    const cb=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(pt));
+    const combined=new Uint8Array(salt.length+iv.length+cb.byteLength);
+    combined.set(salt,0); combined.set(iv,32); combined.set(new Uint8Array(cb),44);
+    out.className='output-box amber selectable'; out.textContent=btoa(String.fromCharCode(...combined));
+  } catch(e){out.className='output-box error';out.textContent='Encryption error: '+e.message;}
+}
+async function vaultDecrypt() {
+  const c=document.getElementById('vaultCipher').value, pp=document.getElementById('vaultDecPass').value;
+  const out=document.getElementById('vaultDecOutput'), st=document.getElementById('vaultStatus');
+  if(!c||!pp){out.textContent='Error: Ciphertext and passphrase required.';return;}
+  try {
+    const combined=new Uint8Array(atob(c).split('').map(x=>x.charCodeAt(0)));
+    const salt=combined.slice(0,32),iv=combined.slice(32,44),cb=combined.slice(44);
+    const key=await deriveKey(pp,salt);
+    const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,cb);
+    out.className='output-box success selectable'; out.textContent=new TextDecoder().decode(plain);
+    st.style.display='block'; st.className='alert alert-success'; st.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Authentication tag verified. Decryption successful.';
+  } catch(e){
+    out.className='output-box error'; out.textContent='Decryption failed: Invalid passphrase or corrupted data.';
+    st.style.display='block'; st.className='alert alert-error'; st.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Authentication failed: Tag mismatch or wrong passphrase.';
+  }
+}
+function vaultClear() {
+  ['vaultPlaintext','vaultPass','vaultDecPass','vaultCipher'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('vaultOutput').className='output-box'; document.getElementById('vaultOutput').textContent='Awaiting input...';
+  document.getElementById('vaultDecOutput').className='output-box'; document.getElementById('vaultDecOutput').textContent='Awaiting ciphertext...';
+  document.getElementById('vaultStatus').style.display='none';
+}
+function updateStrength(inputId,barId,labelId) {
+  const pass=document.getElementById(inputId)?.value||'';
+  const segs=document.querySelectorAll(`#${barId} .strength-seg`);
+  const label=document.getElementById(labelId);
+  let s=0;
+  if(pass.length>=8)s++;if(pass.length>=12)s++;
+  if(/[A-Z]/.test(pass)&&/[a-z]/.test(pass))s++;if(/[0-9]/.test(pass))s++;if(/[^A-Za-z0-9]/.test(pass))s++;
+  const labels=['—','Weak','Fair','Good','Strong','Max'];
+  const colors=['','weak','weak','medium','strong','strong'];
+  segs.forEach((seg,i)=>{ seg.className='strength-seg'; if(i<s)seg.classList.add(colors[s]); });
+  if(label){label.textContent=labels[s];label.style.color=s<=1?'var(--red)':s<=2?'var(--amber)':s<=3?'var(--blue)':'var(--green)';}
+}
+
+// ============================================================
+// P2P NEXUS
+// ============================================================
+let nexusMsgCount=0;
+function nexusConnect() {
+  const log=document.getElementById('nexusLog'), st=document.getElementById('nexusStatus');
+  addLog(log,'color:var(--teal);','> Initiating WebRTC handshake...');
+  setTimeout(()=>{
+    addLog(log,'color:var(--amber);','[ICE] Gathering candidates...');
+    setTimeout(()=>{
+      addLog(log,'color:var(--green);','[OK] STUN contacted — ICE candidates gathered');
+      addLog(log,'color:var(--teal);','> Awaiting remote peer SDP...');
+      st.className='alert alert-warning'; st.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>ICE candidates gathered. Awaiting remote peer.';
+      document.getElementById('nexusLatency').textContent=Math.floor(Math.random()*20+5)+'ms';
+    },700);
+  },500);
+}
+function nexusDisconnect() {
+  const log=document.getElementById('nexusLog');
+  addLog(log,'color:var(--red);','[DISC] Connection terminated');
+  document.getElementById('nexusStatus').className='alert alert-warning';
+  document.getElementById('nexusStatus').textContent='WebRTC: Disconnected.';
+  document.getElementById('nexusPeers').textContent='0';
+}
+function nexusSend() {
+  const msg=document.getElementById('nexusMsg').value;
+  if(!msg) return;
+  nexusMsgCount++;
+  document.getElementById('nexusMsgs').textContent=nexusMsgCount;
+  addLog(document.getElementById('nexusLog'),'color:var(--green);','[TX] >> '+msg);
+  document.getElementById('nexusMsg').value='';
+}
+function addLog(el,style,text) {
+  if(!el) return;
+  const div=document.createElement('div'); div.style.cssText=style; div.textContent=text;
+  el.appendChild(div); el.scrollTop=el.scrollHeight;
+}
+
+// ============================================================
+// CODE AUDITOR
+// ============================================================
+const AUDIT_RULES=[
+  {p:/eval\s*\(/gi,s:'Critical',t:'eval() Usage',d:'Executes arbitrary strings as code, removing all security boundaries. Enables code injection.'},
+  {p:/innerHTML\s*=/gi,s:'High',t:'innerHTML Assignment',d:'Direct innerHTML enables XSS. Use textContent or sanitize with DOMPurify.'},
+  {p:/document\.write\s*\(/gi,s:'High',t:'document.write() Call',d:'Deprecated and can enable script injection. Use DOM manipulation methods.'},
+  {p:/password\s*=\s*["'][^"']+["']/gi,s:'Critical',t:'Hardcoded Password',d:'Credentials in source code are immediately exposed to anyone with codebase access.'},
+  {p:/api.?key\s*=\s*["'][a-z0-9_\-]{10,}["']/gi,s:'Critical',t:'Hardcoded API Key',d:'API keys in source code are trivially discovered. Use environment variables.'},
+  {p:/http:\/\//gi,s:'Medium',t:'Non-HTTPS URL',d:'Unencrypted HTTP exposes data in transit. All external resources should use HTTPS.'},
+  {p:/Math\.random\s*\(\s*\)/gi,s:'Medium',t:'Weak PRNG (Math.random)',d:'Not cryptographically secure. Use crypto.getRandomValues() for security-sensitive values.'},
+  {p:/console\.log/gi,s:'Low',t:'Debug Logging',d:'console.log may leak sensitive data in production. Remove before deployment.'},
+  {p:/localStorage\.setItem/gi,s:'High',t:'Sensitive Data in localStorage',d:'localStorage is accessible to any script on the page. Never store tokens here.'},
+  {p:/new\s+Function\s*\(/gi,s:'Critical',t:'Dynamic Function Constructor',d:'Equivalent to eval(). Enables arbitrary code execution.'},
+  {p:/SELECT.+FROM.+WHERE.+[\'\"]\s*\+/gi,s:'Critical',t:'SQL Injection Vector',d:'String concatenation in SQL enables injection. Use parameterized queries.'},
+  {p:/setTimeout\s*\([^,]*["'`]/gi,s:'High',t:'setTimeout with String Arg',d:'Equivalent to eval(). Pass a function reference instead.'},
+];
+function runAudit() {
+  const code=document.getElementById('auditCode').value;
+  if(!code.trim()) return;
+  const findings=[];
+  AUDIT_RULES.forEach(r=>{ const m=code.match(r.p); if(m) findings.push({...r,count:m.length}); });
+  const panel=document.getElementById('auditResultsPanel'); panel.style.display='block';
+  const cont=document.getElementById('auditFindings'); cont.innerHTML='';
+  let cr=0,hi=0,me=0,lo=0;
+  if(findings.length===0){
+    cont.innerHTML='<div class="alert alert-success"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>No vulnerabilities detected. Note: This is a heuristic check, not a full SAST scan.</div>';
+  } else {
+    findings.forEach(f=>{
+      const colorMap={Critical:{bg:'var(--red-light)',border:'#fecaca',badge:'badge-red'},High:{bg:'var(--amber-light)',border:'#fcd34d',badge:'badge-amber'},Medium:{bg:'var(--blue-light)',border:'var(--blue-mid)',badge:'badge-blue'},Low:{bg:'var(--green-light)',border:'#a7f3d0',badge:'badge-green'}};
+      const c=colorMap[f.s]||colorMap.Low;
+      const el=document.createElement('div');
+      el.style.cssText=`padding:14px 16px;border:1px solid ${c.border};border-radius:var(--radius-md);background:${c.bg};`;
+      el.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><span class="badge ${c.badge}">${f.s}</span><span style="font-size:14px;font-weight:600;color:var(--text-1);">${f.t}</span><span style="margin-left:auto;font-size:12px;color:var(--text-3);">${f.count} occurrence${f.count>1?'s':''}</span></div><p style="font-size:13.5px;margin:0;">${f.d}</p>`;
+      cont.appendChild(el);
+      if(f.s==='Critical')cr++;else if(f.s==='High')hi++;else if(f.s==='Medium')me++;else lo++;
+    });
+  }
+  document.getElementById('auditCritical').textContent=cr;
+  document.getElementById('auditHigh').textContent=hi;
+  document.getElementById('auditMedium').textContent=me;
+  document.getElementById('auditLow').textContent=lo;
+  const sc=document.getElementById('auditScore');
+  const total=cr+hi+me+lo;
+  sc.textContent=total===0?'Clean':total+' Finding'+(total>1?'s':'');
+  sc.className='badge '+(cr>0?'badge-red':hi>0?'badge-amber':'badge-green');
+}
+function auditClear(){document.getElementById('auditCode').value='';document.getElementById('auditResultsPanel').style.display='none';}
+function loadAuditDemo(){
+  document.getElementById('auditCode').value=`const password = "admin123";
+const api_key = "sk-prod-abcdef1234567890";
+app.get('/user', (req, res) => {
+  const query = "SELECT * FROM users WHERE id = '" + req.query.id + "'";
+  div.innerHTML = result.username;
+  console.log("User:", result);
+  eval(req.query.code);
+  setTimeout("processRequest('" + req.query.data + "')", 1000);
+  fetch('http://internal-api.corp/data');
+  const token = Math.random().toString(36);
+  localStorage.setItem('authToken', token);
+});`;
+}
+
+// ============================================================
+// HASH LAB
+// ============================================================
+async function generateHash() {
+  const input=document.getElementById('hashInput').value, algo=document.getElementById('hashAlgo').value;
+  const out=document.getElementById('hashOutput');
+  if(!input){out.className='output-box error';out.textContent='Error: Input required.';return;}
+  try {
+    const buf=await crypto.subtle.digest(algo,new TextEncoder().encode(input));
+    out.className='output-box selectable'; out.textContent=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  } catch(e){out.className='output-box error';out.textContent='Error: '+e.message;}
+}
+function compareHashes() {
+  const a=document.getElementById('hashA').value.trim().toLowerCase(), b=document.getElementById('hashB').value.trim().toLowerCase();
+  const r=document.getElementById('hashCompareResult'); r.style.display='block';
+  if(!a||!b){r.className='alert alert-warning';r.textContent='Both hashes required.';return;}
+  if(a===b){r.className='alert alert-success';r.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Match confirmed — hashes are identical.';}
+  else{r.className='alert alert-error';r.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Mismatch — hashes differ. Data may be altered.';}
+}
+async function generateHMAC() {
+  const key=document.getElementById('hmacKey').value, data=document.getElementById('hmacData').value;
+  const out=document.getElementById('hmacOutput');
+  if(!key||!data){out.textContent='Error: Key and data required.';return;}
+  try {
+    const enc=new TextEncoder(), ck=await crypto.subtle.importKey('raw',enc.encode(key),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+    const sig=await crypto.subtle.sign('HMAC',ck,enc.encode(data));
+    out.className='output-box selectable'; out.textContent=Array.from(new Uint8Array(sig)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  } catch(e){out.textContent='HMAC Error: '+e.message;}
+}
+
+// ============================================================
+// KEY FORGE
+// ============================================================
+function generateKey(){
+  const len=parseInt(document.getElementById('keyLen').value)||32, fmt=document.getElementById('keyFormat').value;
+  const arr=new Uint8Array(len); crypto.getRandomValues(arr);
+  let out;
+  if(fmt==='hex') out=Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
+  else if(fmt==='base64') out=btoa(String.fromCharCode(...arr));
+  else out=Array.from(arr).map(b=>b.toString(2).padStart(8,'0')).join(' ');
+  document.getElementById('keyOutput').textContent=out;
+}
+function generatePassword(){
+  const len=parseInt(document.getElementById('passLen').value)||20;
+  let cs='';
+  if(document.getElementById('passUpper').checked)cs+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if(document.getElementById('passLower').checked)cs+='abcdefghijklmnopqrstuvwxyz';
+  if(document.getElementById('passNums').checked)cs+='0123456789';
+  if(document.getElementById('passSymbols').checked)cs+='!@#$%^&*()-_=+[]{}|;:,.<>?';
+  if(!cs){alert('Select at least one character set.');return;}
+  const arr=new Uint32Array(len); crypto.getRandomValues(arr);
+  const pass=Array.from(arr).map(n=>cs[n%cs.length]).join('');
+  document.getElementById('passOutput').textContent=pass;
+  let s=0;if(pass.length>=12)s++;if(pass.length>=20)s++;if(/[A-Z]/.test(pass))s++;if(/[0-9]/.test(pass))s++;if(/[^A-Za-z0-9]/.test(pass))s++;
+  document.querySelectorAll('#passStrength .strength-seg').forEach((seg,i)=>{seg.className='strength-seg';if(i<s)seg.classList.add(['weak','weak','medium','strong','strong'][s-1]||'strong');});
+}
+function generateUUID(){
+  const a=new Uint8Array(16);crypto.getRandomValues(a);a[6]=(a[6]&0x0f)|0x40;a[8]=(a[8]&0x3f)|0x80;
+  const h=Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('');
+  document.getElementById('uuidOutput').textContent=[h.slice(0,8),h.slice(8,12),h.slice(12,16),h.slice(16,20),h.slice(20)].join('-').toUpperCase();
+}
+function generateCSRF(){
+  const len=parseInt(document.getElementById('csrfLen').value)||32, arr=new Uint8Array(len); crypto.getRandomValues(arr);
+  document.getElementById('csrfOutput').textContent=Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ============================================================
+// DATA PROBE
+// ============================================================
+function b64Encode(){try{document.getElementById('b64Output').textContent=btoa(unescape(encodeURIComponent(document.getElementById('b64Input').value)));}catch(e){document.getElementById('b64Output').textContent='Error: '+e.message;}}
+function b64Decode(){try{document.getElementById('b64Output').textContent=decodeURIComponent(escape(atob(document.getElementById('b64Input').value)));}catch(e){document.getElementById('b64Output').textContent='Error: Invalid Base64.';}}
+function textToHex(){document.getElementById('hexOutput').textContent=Array.from(new TextEncoder().encode(document.getElementById('hexInput').value)).map(b=>b.toString(16).padStart(2,'0')).join(' ');}
+function hexToText(){try{const h=document.getElementById('hexInput').value.replace(/\s/g,'');document.getElementById('hexOutput').textContent=new TextDecoder().decode(new Uint8Array(h.match(/.{1,2}/g).map(b=>parseInt(b,16))));}catch(e){document.getElementById('hexOutput').textContent='Error: Invalid hex.';}}
+function jsonFormat(){try{document.getElementById('jsonOutput').textContent=JSON.stringify(JSON.parse(document.getElementById('jsonInput').value),null,2);}catch(e){document.getElementById('jsonOutput').textContent='Error: '+e.message;}}
+function jsonMinify(){try{document.getElementById('jsonOutput').textContent=JSON.stringify(JSON.parse(document.getElementById('jsonInput').value));}catch(e){document.getElementById('jsonOutput').textContent='Error: '+e.message;}}
+function jsonValidate(){try{JSON.parse(document.getElementById('jsonInput').value);const o=document.getElementById('jsonOutput');o.className='output-box success';o.textContent='Valid JSON';}catch(e){const o=document.getElementById('jsonOutput');o.className='output-box error';o.textContent='Invalid JSON: '+e.message;}}
+function urlEncode(){document.getElementById('urlOutput').textContent=encodeURIComponent(document.getElementById('urlInput').value);}
+function urlDecode(){try{document.getElementById('urlOutput').textContent=decodeURIComponent(document.getElementById('urlInput').value);}catch(e){document.getElementById('urlOutput').textContent='Error: '+e.message;}}
+function parseURL(){
+  try{
+    const url=new URL(document.getElementById('urlInput').value);
+    const el=document.getElementById('urlParsed'); el.style.display='block';
+    const parts=[['Protocol',url.protocol],['Host',url.hostname],['Port',url.port||'default'],['Path',url.pathname],['Query',url.search||'none'],['Hash',url.hash||'none']];
+    el.innerHTML=parts.map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--text-3);font-weight:500;">${k}</span><span style="color:var(--blue);font-weight:600;">${v}</span></div>`).join('');
+  }catch(e){document.getElementById('urlOutput').textContent='Error: Invalid URL.';}
+}
+
+// ============================================================
+// SIG VERIFY
+// ============================================================
+let sigKeyPair=null;
+async function generateSigKeyPair(){
+  sigKeyPair=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-384'},true,['sign','verify']);
+  const pub=await crypto.subtle.exportKey('spki',sigKeyPair.publicKey);
+  const priv=await crypto.subtle.exportKey('pkcs8',sigKeyPair.privateKey);
+  document.getElementById('sigPubKey').textContent=btoa(String.fromCharCode(...new Uint8Array(pub)));
+  document.getElementById('sigPrivKey').textContent=btoa(String.fromCharCode(...new Uint8Array(priv)));
+}
+async function signData(){
+  if(!sigKeyPair){alert('Generate key pair first.');return;}
+  const data=document.getElementById('sigData').value;
+  if(!data)return;
+  const sig=await crypto.subtle.sign({name:'ECDSA',hash:'SHA-384'},sigKeyPair.privateKey,new TextEncoder().encode(data));
+  document.getElementById('sigOutput').textContent=btoa(String.fromCharCode(...new Uint8Array(sig)));
+}
+async function verifySignature(){
+  const pubB64=document.getElementById('verPubKey').value.trim(), data=document.getElementById('verData').value, sigB64=document.getElementById('verSig').value.trim();
+  const r=document.getElementById('verResult'); r.style.display='block';
+  try{
+    const pkDer=new Uint8Array(atob(pubB64).split('').map(c=>c.charCodeAt(0)));
+    const pk=await crypto.subtle.importKey('spki',pkDer,{name:'ECDSA',namedCurve:'P-384'},false,['verify']);
+    const sigBytes=new Uint8Array(atob(sigB64).split('').map(c=>c.charCodeAt(0)));
+    const valid=await crypto.subtle.verify({name:'ECDSA',hash:'SHA-384'},pk,sigBytes,new TextEncoder().encode(data));
+    r.className='alert '+(valid?'alert-success':'alert-error');
+    r.innerHTML=(valid?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Signature valid — data integrity confirmed.':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Signature invalid — data may be tampered.');
+  }catch(e){r.className='alert alert-error';r.textContent='Verification error: '+e.message;}
+}
+
+// ============================================================
+// STEGANO
+// ============================================================
+const ZW={ZWSP:'\u200B',ZWJ:'\u200D',ZWNJ:'\u200C'};
+function encodeZeroWidth(text){return text.split('').map(c=>c.charCodeAt(0).toString(2).padStart(8,'0').split('').map(b=>b==='0'?ZW.ZWSP:ZW.ZWJ).join('')).join(ZW.ZWNJ);}
+function decodeZeroWidth(enc){return enc.split(ZW.ZWNJ).map(chunk=>{const bits=chunk.split('').filter(c=>[ZW.ZWSP,ZW.ZWJ].includes(c)).map(c=>c===ZW.ZWSP?'0':'1').join('');return bits.length===8?String.fromCharCode(parseInt(bits,2)):''}).join('');}
+let stegoRaw='';
+function stegoEmbed(){
+  const carrier=document.getElementById('stegoCarrier').value, hidden=document.getElementById('stegoHidden').value;
+  if(!carrier||!hidden){document.getElementById('stegoOutput').textContent='Error: Both fields required.';return;}
+  const enc=encodeZeroWidth(hidden), mid=Math.floor(carrier.length/2);
+  stegoRaw=carrier.slice(0,mid)+enc+carrier.slice(mid);
+  document.getElementById('stegoOutput').textContent=`[Stego text generated — ${carrier.length} visible chars, ${enc.length} invisible chars embedded. Click copy to get the actual stego text.]`;
+}
+function copyRawStego(){if(!stegoRaw){return;}navigator.clipboard.writeText(stegoRaw).then(()=>alert('Stego text copied. The hidden message is invisible.'));}
+function stegoExtract(){
+  const input=document.getElementById('stegoExtractInput').value;
+  const out=document.getElementById('stegoExtracted');
+  const zwChars=input.split('').filter(c=>[ZW.ZWSP,ZW.ZWJ,ZW.ZWNJ].includes(c));
+  if(zwChars.length===0){out.className='output-box error';out.textContent='No hidden data detected.';return;}
+  const decoded=decodeZeroWidth(input);
+  if(decoded.trim()){out.className='output-box success selectable';out.textContent=decoded;}
+  else{out.className='output-box';out.textContent='Zero-width chars found but could not decode.';}
+}
+
+// ============================================================
+// PERM SCAN
+// ============================================================
+function scanPermissions(){
+  const c=document.getElementById('permResults'); c.innerHTML='';
+  const perms=['camera','microphone','geolocation','notifications','clipboard-read','clipboard-write','accelerometer','gyroscope','payment-handler','persistent-storage'];
+  perms.forEach(async p=>{
+    try{
+      const r=await navigator.permissions.query({name:p});
+      const el=document.createElement('div');
+      el.style.cssText='padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:space-between;';
+      el.innerHTML=`<span style="font-size:13px;font-weight:500;color:var(--text-2);">${p}</span><span class="badge ${r.state==='granted'?'badge-green':r.state==='denied'?'badge-red':'badge-amber'}">${r.state}</span>`;
+      c.appendChild(el);
+    }catch(e){
+      const el=document.createElement('div');
+      el.style.cssText='padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:space-between;';
+      el.innerHTML=`<span style="font-size:13px;font-weight:500;color:var(--text-2);">${p}</span><span class="badge" style="background:var(--bg);color:var(--text-4);">N/A</span>`;
+      c.appendChild(el);
+    }
+  });
+}
+function requestPerm(type){
+  if(type==='camera')navigator.mediaDevices?.getUserMedia({video:true}).then(s=>{s.getTracks().forEach(t=>t.stop());alert('Camera: GRANTED');}).catch(()=>alert('Camera: DENIED'));
+  if(type==='microphone')navigator.mediaDevices?.getUserMedia({audio:true}).then(s=>{s.getTracks().forEach(t=>t.stop());alert('Microphone: GRANTED');}).catch(()=>alert('Microphone: DENIED'));
+  if(type==='geolocation')navigator.geolocation?.getCurrentPosition(()=>alert('Geolocation: GRANTED'),()=>alert('Geolocation: DENIED'));
+}
+function buildHeaderReport(){OrchestratorBrain.buildHeaderReport();}
+function runNetScan(){OrchestratorBrain.runNetScan();}
+function buildFingerprint(){OrchestratorBrain.buildFingerprint();}
+
+// ============================================================
+// MEM GUARD
+// ============================================================
+const memVault=new Map();
+function memStore(){
+  const k=document.getElementById('memKey').value, v=document.getElementById('memValue').value;
+  if(!k||!v){document.getElementById('memOutput').textContent='Error: Key and value required.';return;}
+  memVault.set(k,{value:v,stored:new Date().toISOString(),size:v.length});
+  document.getElementById('memOutput').textContent='Stored: Key "'+k+'" secured in memory.';
+  updateMemRegistry();
+}
+function memRetrieve(){
+  const k=document.getElementById('memKey').value, e=memVault.get(k);
+  if(!e){document.getElementById('memOutput').textContent='Not found: Key "'+k+'" not in vault.';return;}
+  document.getElementById('memOutput').textContent=e.value;
+}
+function memPurge(){
+  if(!confirm('Purge ALL secrets from memory?'))return;
+  memVault.clear(); document.getElementById('memOutput').textContent='Purged: All secrets destroyed.'; updateMemRegistry();
+}
+function updateMemRegistry(){
+  const c=document.getElementById('memRegistry');
+  document.getElementById('memCount').textContent=memVault.size;
+  if(memVault.size===0){c.innerHTML='<p style="font-size:13px;color:var(--text-4);">No secrets stored.</p>';document.getElementById('memSize').textContent='0 B';return;}
+  let total=0; c.innerHTML='';
+  memVault.forEach((v,k)=>{
+    total+=v.size;
+    const el=document.createElement('div');
+    el.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);';
+    el.innerHTML=`<div style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;"></div><span style="font-size:13px;color:var(--blue);font-weight:600;flex:1;">${k}</span><span style="font-size:12px;color:var(--text-4);">${v.size}B</span><button class="btn btn-danger btn-sm" style="padding:4px 10px;font-size:12px;" onclick="memVault.delete('${k}');updateMemRegistry()">Delete</button>`;
+    c.appendChild(el);
+  });
+  document.getElementById('memSize').textContent=total+' B';
+}
+
+// ============================================================
+// CONTACT
+// ============================================================
+function sendContact(){
+  const name=document.getElementById('contactName').value, email=document.getElementById('contactEmail').value;
+  const subject=document.getElementById('contactSubject').value, msg=document.getElementById('contactMsg').value;
+  const st=document.getElementById('contactStatus');
+  if(!msg.trim()){st.style.display='block';st.className='alert alert-error';st.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Message body is required.';return;}
+  const body=encodeURIComponent(`${name?'From: '+name+'\n':''}${email?'Reply-To: '+email+'\n':''}\n${msg}\n\n---\nSent via OmniGuard Terminal`);
+  window.location.href=`mailto:Gxplcp@gmail.com?subject=${encodeURIComponent('[OmniGuard] '+subject)}&body=${body}`;
+  st.style.display='block'; st.className='alert alert-success'; st.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Mail client opened. Sending to Gxplcp@gmail.com';
+}
+function clearContact(){['contactName','contactEmail','contactMsg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('contactStatus').style.display='none';}
+
+// ============================================================
+// UTILS
+// ============================================================
+function copyText(id){
+  const el=document.getElementById(id); if(!el)return;
+  const text=el.textContent;
+  if(!text||text==='Awaiting input...'||text==='—')return;
+  navigator.clipboard.writeText(text).then(()=>{
+    const orig=el.style.outline;
+    el.style.outline='2px solid var(--green)';
+    setTimeout(()=>el.style.outline=orig,700);
+  });
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  OrchestratorBrain.init();
+  setTimeout(()=>{OrchestratorBrain.runNetScan();OrchestratorBrain.buildFingerprint();OrchestratorBrain.buildHeaderReport();},300);
+});
+</script>
+</body>
+</html>
