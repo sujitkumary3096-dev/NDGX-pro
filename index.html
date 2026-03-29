@@ -601,7 +601,22 @@ tbody tr:hover td { background: var(--bg); }
 </style>
 </head>
 <body>
-
+   <div id="login-screen" class="min-h-screen flex items-center justify-center px-4 bg-white z-[9999] fixed inset-0">
+    <div class="max-w-md w-full p-8 rounded-3xl shadow-2xl text-center border border-gray-100">
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">OmniGuard Elite</h1>
+        <p class="text-gray-500 mt-2">Sovereign Access Required</p>
+      </div>
+      <div class="space-y-4">
+        <button onclick="loginGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-50 transition">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20"> Continue with Google
+        </button>
+        <div id="recaptcha-container"></div>
+        <input type="tel" id="phone-number" placeholder="+91..." class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none">
+        <button onclick="loginPhone()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold">Request OTP</button>
+      </div>
+    </div>
+</div>
 <!-- ============================================================
      NAVIGATION
      ============================================================ -->
